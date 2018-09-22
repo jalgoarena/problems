@@ -24,8 +24,6 @@ type testCase struct {
 	Output interface{}   `json:"output"`
 }
 
-var Problems []Problem
-
 type Problem struct {
 	Id          string     `json:"id"`
 	Title       string     `json:"title"`

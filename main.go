@@ -1,12 +1,10 @@
 package main
 
 import (
-	"./app"
-	"./domain"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
+	"github.com/jalgoarena/problems-store/app"
 )
 
 func SetupRouter() *gin.Engine {
@@ -25,15 +23,16 @@ func main() {
 	box := packr.NewBox("./problems")
 
 	problemsJson, err := box.Open("problems.json")
+
 	if err != nil {
-		fmt.Println("[err] opening problems.json file: ", err.Error())
+		fmt.Println("[err] opening problems.json file", err.Error())
 		return
 	}
 
-	jsonParser := json.NewDecoder(problemsJson)
+	err = app.LoadProblems(problemsJson)
 
-	if err = jsonParser.Decode(&domain.Problems); err != nil {
-		fmt.Println("[err] parsing problems.json file", err.Error())
+	if err != nil {
+		fmt.Println("[err] loading problems.json file", err.Error())
 		return
 	}
 
