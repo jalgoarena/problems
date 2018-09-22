@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"os"
+	"github.com/gobuffalo/packr"
 )
 
 func SetupRouter() *gin.Engine {
@@ -15,13 +15,16 @@ func SetupRouter() *gin.Engine {
 	v1 := router.Group("api/v1")
 	{
 		v1.GET("/problems", app.GetProblems)
+		v1.GET("/problems/:id", app.GetProblem)
 	}
 
 	return router
 }
 
 func main() {
-	problemsJson, err := os.Open("problems.json")
+	box := packr.NewBox("./problems")
+
+	problemsJson, err := box.Open("problems.json")
 	if err != nil {
 		fmt.Println("[err] opening problems.json file: ", err.Error())
 		return
