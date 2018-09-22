@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
 	"github.com/jalgoarena/problems-store/app"
+	"os"
 )
 
 func SetupRouter() *gin.Engine {
@@ -20,9 +21,15 @@ func SetupRouter() *gin.Engine {
 }
 
 func main() {
-	box := packr.NewBox("./problems")
+	const (
+		staticDir        = "./problems"
+		problemsFileName = "problems.json"
+		defaultPort      = "8080"
+	)
 
-	problemsJson, err := box.Open("problems.json")
+	box := packr.NewBox(staticDir)
+
+	problemsJson, err := box.Open(problemsFileName)
 
 	if err != nil {
 		fmt.Println("[err] opening problems.json file", err.Error())
@@ -37,5 +44,11 @@ func main() {
 	}
 
 	router := SetupRouter()
-	router.Run(":8080")
+
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = defaultPort
+	}
+
+	router.Run(":" + port)
 }
