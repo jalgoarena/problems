@@ -39,6 +39,7 @@ func init() {
 		os.Exit(1)
 	}
 
+	problemsJson.Close()
 	fmt.Println("Problems loaded successfully")
 }
 
