@@ -27,7 +27,6 @@ func init() {
 	)
 
 	box := packr.NewBox(staticDir)
-
 	problemsJson, err := box.Open(problemsFileName)
 
 	if err != nil {
@@ -35,9 +34,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	err = app.LoadProblems(problemsJson)
-
-	if err != nil {
+	if err = app.LoadProblems(problemsJson); err != nil {
 		fmt.Fprintf(os.Stderr, "loading problems.json file: %v\n", err.Error())
 		os.Exit(1)
 	}
@@ -49,8 +46,8 @@ func main() {
 	const defaultPort = "8080"
 
 	router := SetupRouter()
-
 	port := os.Getenv("PORT")
+
 	if len(port) == 0 {
 		port = defaultPort
 	}

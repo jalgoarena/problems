@@ -41,6 +41,5 @@ func filter(problems []domain.Problem, f func(problem domain.Problem) bool) doma
 		}
 	}
 
-	var empty domain.Problem
-	return empty
+	return domain.Problem{}
 }
