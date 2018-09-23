@@ -9,11 +9,6 @@ import (
 	"testing"
 )
 
-func TestMain(m *testing.M) {
-	LoadProblems()
-	m.Run()
-}
-
 func TestGetFibProblem(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	testRouter := SetupRouter()
