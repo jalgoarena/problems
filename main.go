@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
 	"github.com/jalgoarena/problems-store/app"
+	"log"
 	"os"
 )
 
@@ -30,13 +31,11 @@ func init() {
 	problemsJson, err := box.Open(problemsFileName)
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "opening problems.json file: %v\n", err.Error())
-		os.Exit(1)
+		log.Fatalf("opening problems.json file: %v\n", err.Error())
 	}
 
 	if err = app.LoadProblems(problemsJson); err != nil {
-		fmt.Fprintf(os.Stderr, "loading problems.json file: %v\n", err.Error())
-		os.Exit(1)
+		log.Fatalf("loading problems.json file: %v\n", err.Error())
 	}
 
 	problemsJson.Close()
