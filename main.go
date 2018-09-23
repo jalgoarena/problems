@@ -20,11 +20,10 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
-func main() {
+func LoadProblems() {
 	const (
 		staticDir        = "./problems"
 		problemsFileName = "problems.json"
-		defaultPort      = "8080"
 	)
 
 	box := packr.NewBox(staticDir)
@@ -32,16 +31,22 @@ func main() {
 	problemsJson, err := box.Open(problemsFileName)
 
 	if err != nil {
-		fmt.Println("[err] opening problems.json file", err.Error())
-		return
+		fmt.Fprintf(os.Stderr, "opening problems.json file: %v\n", err.Error())
+		os.Exit(1)
 	}
 
 	err = app.LoadProblems(problemsJson)
 
 	if err != nil {
-		fmt.Println("[err] loading problems.json file", err.Error())
-		return
+		fmt.Fprintf(os.Stderr, "loading problems.json file: %v\n", err.Error())
+		os.Exit(1)
 	}
+}
+
+func main() {
+	const defaultPort = "8080"
+
+	LoadProblems()
 
 	router := SetupRouter()
 

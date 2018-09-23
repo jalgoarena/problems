@@ -2,10 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/gobuffalo/packr"
-	"github.com/jalgoarena/problems-store/app"
 	"github.com/jalgoarena/problems-store/domain"
 	"net/http"
 	"net/http/httptest"
@@ -13,22 +10,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	box := packr.NewBox("./problems")
-
-	problemsJson, err := box.Open("problems.json")
-
-	if err != nil {
-		fmt.Println("[err] opening problems.json file", err.Error())
-		return
-	}
-
-	err = app.LoadProblems(problemsJson)
-
-	if err != nil {
-		fmt.Println("[err] loading problems.json file", err.Error())
-		return
-	}
-
+	LoadProblems()
 	m.Run()
 }
 
