@@ -24,7 +24,6 @@ func GetProblem(c *gin.Context) {
 }
 
 func LoadProblems(problemsJson io.Reader) error {
-
 	jsonParser := json.NewDecoder(problemsJson)
 
 	if err := jsonParser.Decode(&problems); err != nil {

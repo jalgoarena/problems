@@ -31,11 +31,11 @@ func init() {
 	problemsJson, err := box.Open(problemsFileName)
 
 	if err != nil {
-		log.Fatalf("opening problems.json file: %v\n", err.Error())
+		log.Fatalf("opening problems.json file: %v\n", err)
 	}
 
 	if err = app.LoadProblems(problemsJson); err != nil {
-		log.Fatalf("loading problems.json file: %v\n", err.Error())
+		log.Fatalf("loading problems.json file: %v\n", err)
 	}
 
 	problemsJson.Close()
