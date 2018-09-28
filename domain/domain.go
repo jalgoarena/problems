@@ -6,7 +6,7 @@ type returnStatement struct {
 	Generic string `json:"generic"`
 }
 
-type parameter struct {
+type Parameter struct {
 	Name    string `json:"name"`
 	Type    string `json:"type"`
 	Comment string `json:"comment"`
@@ -16,7 +16,7 @@ type parameter struct {
 type function struct {
 	Name       string          `json:"name"`
 	Return     returnStatement `json:"returnStatement"`
-	Parameters []parameter     `json:"parameters"`
+	Parameters []Parameter     `json:"parameters"`
 }
 
 type testCase struct {
