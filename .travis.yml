@@ -2,8 +2,6 @@ language: go
 sudo: false
 matrix:
   include:
-  # "1.x" always refers to the latest Go version, inc. the patch release.
-  # e.g. "1.x" is 1.11 until 1.11.1 is available.
   - go: 1.x
     env: LATEST=true
   - go: 1.7.x
@@ -29,7 +27,7 @@ script:
 - go vet $(go list ./... | grep -v /vendor/)
 - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 # Only build binaries from the latest Go release.
-- if [ "${LATEST}" = "true" ]; then gox -os="linux darwin windows" -arch="amd64" -output="logshare.." -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
+- if [ "${LATEST}" = "true" ]; then gox -os="linux darwin windows" -arch="amd64" -output="bin/{{.Dir}}_1.0.0_{{.OS}}_{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
@@ -39,10 +37,7 @@ deploy:
   api_key:
     secure: mHbwVlgqbuJqk8T8Aaa7/GtPxxzkvpy+l/TOEWfuuVK8+cwrNUjKJszl55eHXcbcLtT4KSILlL2Bt/qmae7EyS77UiFfDDduM13hD6PyewKpQv/G2F2JqRSTXv0OJ1LFBgAJXfCQt2gzLL5BXUnmoToGyr+8MnV++ADf+/UJUajOZ+V84COXbwFjUaODtQfaOo9UVevGG1P7h9iyIo7oCfwGC4RIg73ulfCY3zHln6dr2QriZkPtrfqVSs4BtLL5QHlIRVTEna2LgLPIQRAwZjzfD9nzYlKGooHfYH0myaBkeTW//OpaOfZOEfjlCokxmao+jOYSMqJvO36lUiciznhdVbrrwWSj5P1jPLhQjmFIFxjPhcJLu36jpKEvDmxv2pE3Bqk6RK7XEHQKyMgJ3DB2HDoLiQMtjmSzz+i2iyj2ydGi+F8kYAGhSjXQgTMECxGpURocxbG3bdlbF8cBT1PjSYCmcf8WdWKSh7krGbchbneKaSYfuXT6chhgYvUgayxZ6q6n6tAOHbgu8bfn7whEsfCfgr/uI8r4LX15/EE4mBjkTe3qDuGDRoYOxic8Y4x1MQF8tg1JOHdWDtJRDLruiDCuZ0TAel+zPkUe+kzhnuTEJJY4jBIQP2EkNqPeZpoukGkRMABSux9Rgnso8qyKaeEFkuvmb6VrnSRXnS8=
   file:
-  # The names of the binaries to output, based on the -output template passed to gox.
-  - logshare.windows.amd64.exe
-  - logshare.darwin.amd64
-  - logshare.linux.amd64
+    - bin/*
   on:
     repo: jalgoarena/problems-store
     # Only build binaries for tagged commits

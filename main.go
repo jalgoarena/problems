@@ -1,12 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
 	"github.com/jalgoarena/problems-store/app"
 	"log"
-	"os"
 )
 
 func SetupRouter() *gin.Engine {
@@ -21,11 +21,16 @@ func SetupRouter() *gin.Engine {
 	return router
 }
 
+const (
+	staticDir        = "./problems"
+	problemsFileName = "problems.json"
+)
+
+var port string
+
 func init() {
-	const (
-		staticDir        = "./problems"
-		problemsFileName = "problems.json"
-	)
+	flag.StringVar(&port, "port", "8080", "Port to listen on")
+	flag.Parse()
 
 	box := packr.NewBox(staticDir)
 	problemsJson, err := box.Open(problemsFileName)
@@ -43,14 +48,6 @@ func init() {
 }
 
 func main() {
-	const defaultPort = "8080"
-
 	router := SetupRouter()
-	port := os.Getenv("PORT")
-
-	if len(port) == 0 {
-		port = defaultPort
-	}
-
 	router.Run(":" + port)
 }
