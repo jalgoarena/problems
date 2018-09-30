@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: problems-store-app
-          image: jalgoarena/problems-store:1.0.0
+          image: jalgoarena/problems-store:1.0.22
           ports:
             - containerPort: 8080
