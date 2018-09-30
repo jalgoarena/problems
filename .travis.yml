@@ -31,15 +31,21 @@ after_success:
 - bash <(curl -s https://codecov.io/bash)
 
 deploy:
-  provider: releases
-  api_key:
-    secure: mHbwVlgqbuJqk8T8Aaa7/GtPxxzkvpy+l/TOEWfuuVK8+cwrNUjKJszl55eHXcbcLtT4KSILlL2Bt/qmae7EyS77UiFfDDduM13hD6PyewKpQv/G2F2JqRSTXv0OJ1LFBgAJXfCQt2gzLL5BXUnmoToGyr+8MnV++ADf+/UJUajOZ+V84COXbwFjUaODtQfaOo9UVevGG1P7h9iyIo7oCfwGC4RIg73ulfCY3zHln6dr2QriZkPtrfqVSs4BtLL5QHlIRVTEna2LgLPIQRAwZjzfD9nzYlKGooHfYH0myaBkeTW//OpaOfZOEfjlCokxmao+jOYSMqJvO36lUiciznhdVbrrwWSj5P1jPLhQjmFIFxjPhcJLu36jpKEvDmxv2pE3Bqk6RK7XEHQKyMgJ3DB2HDoLiQMtjmSzz+i2iyj2ydGi+F8kYAGhSjXQgTMECxGpURocxbG3bdlbF8cBT1PjSYCmcf8WdWKSh7krGbchbneKaSYfuXT6chhgYvUgayxZ6q6n6tAOHbgu8bfn7whEsfCfgr/uI8r4LX15/EE4mBjkTe3qDuGDRoYOxic8Y4x1MQF8tg1JOHdWDtJRDLruiDCuZ0TAel+zPkUe+kzhnuTEJJY4jBIQP2EkNqPeZpoukGkRMABSux9Rgnso8qyKaeEFkuvmb6VrnSRXnS8=
-  skip_cleanup: true
-  file_glob: true
-  file:
-    - bin/*
-  on:
-    repo: jalgoarena/problems-store
-    # Only build binaries for tagged commits
-    tags: true
-    condition: $LATEST = true
+  - provider: releases
+    api_key:
+      secure: mHbwVlgqbuJqk8T8Aaa7/GtPxxzkvpy+l/TOEWfuuVK8+cwrNUjKJszl55eHXcbcLtT4KSILlL2Bt/qmae7EyS77UiFfDDduM13hD6PyewKpQv/G2F2JqRSTXv0OJ1LFBgAJXfCQt2gzLL5BXUnmoToGyr+8MnV++ADf+/UJUajOZ+V84COXbwFjUaODtQfaOo9UVevGG1P7h9iyIo7oCfwGC4RIg73ulfCY3zHln6dr2QriZkPtrfqVSs4BtLL5QHlIRVTEna2LgLPIQRAwZjzfD9nzYlKGooHfYH0myaBkeTW//OpaOfZOEfjlCokxmao+jOYSMqJvO36lUiciznhdVbrrwWSj5P1jPLhQjmFIFxjPhcJLu36jpKEvDmxv2pE3Bqk6RK7XEHQKyMgJ3DB2HDoLiQMtjmSzz+i2iyj2ydGi+F8kYAGhSjXQgTMECxGpURocxbG3bdlbF8cBT1PjSYCmcf8WdWKSh7krGbchbneKaSYfuXT6chhgYvUgayxZ6q6n6tAOHbgu8bfn7whEsfCfgr/uI8r4LX15/EE4mBjkTe3qDuGDRoYOxic8Y4x1MQF8tg1JOHdWDtJRDLruiDCuZ0TAel+zPkUe+kzhnuTEJJY4jBIQP2EkNqPeZpoukGkRMABSux9Rgnso8qyKaeEFkuvmb6VrnSRXnS8=
+    skip_cleanup: true
+    file_glob: true
+    file:
+      - bin/*
+    on:
+      repo: jalgoarena/problems-store
+      # Only build binaries for tagged commits
+      tags: true
+      condition: $LATEST = true
+  - provider: script
+    script: bash docker_push
+    on:
+      repo: jalgoarena/problems-store
+      # Only build binaries for tagged commits
+      tags: true
