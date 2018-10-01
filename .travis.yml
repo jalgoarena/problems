@@ -2,30 +2,29 @@ language: go
 sudo: required
 services:
  - docker
+
 matrix:
   include:
   - go: 1.x
     env: LATEST=true
 
 before_install:
-# gox simplifies building for multiple architectures
-- go get -u github.com/mitchellh/gox
-- go get -u github.com/gobuffalo/packr/packr
-- curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - go get -u github.com/mitchellh/gox
+  - go get -u github.com/gobuffalo/packr/packr
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 install:
-- # skip
+  - # skip
 
 script:
-- diff -u <(echo -n) <(gofmt -d .)
-- dep ensure
-- go vet $(go list ./... | grep -v /vendor/)
-- go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-# Only build binaries from the latest Go release.
-- if [ "${LATEST}" = "true" ]; then packr && gox -os="linux darwin windows" -arch="amd64" -output="bin/{{.Dir}}_1.0.0_{{.OS}}_{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
+  - diff -u <(echo -n) <(gofmt -d .)
+  - dep ensure
+  - go vet $(go list ./... | grep -v /vendor/)
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - if [ "${LATEST}" = "true" ]; then packr && gox -os="linux darwin windows" -arch="amd64" -output="bin/{{.Dir}}_1.0.0_{{.OS}}_{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
 
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
 
 deploy:
   - provider: releases
@@ -37,12 +36,10 @@ deploy:
       - bin/*
     on:
       repo: jalgoarena/problems-store
-      # Only build binaries for tagged commits
       tags: true
       condition: $LATEST = true
   - provider: script
     script: bash docker_push
     on:
       repo: jalgoarena/problems-store
-      # Only build binaries for tagged commits
       tags: true
