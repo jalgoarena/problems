@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
 	"github.com/jalgoarena/problems-store/app"
@@ -32,6 +31,7 @@ var port string
 func init() {
 	flag.StringVar(&port, "port", "8080", "Port to listen on")
 	flag.Parse()
+	log.SetFlags(log.LstdFlags)
 
 	box := packr.NewBox(staticDir)
 	problemsJson, err := box.Open(problemsFileName)
@@ -45,7 +45,7 @@ func init() {
 	}
 
 	problemsJson.Close()
-	fmt.Println("Problems loaded successfully")
+	log.Println("Problems loaded successfully")
 }
 
 func main() {
