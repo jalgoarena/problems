@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/jalgoarena/problems-store/domain"
+	"github.com/jalgoarena/problems-store/problems"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,7 +27,7 @@ func TestGetFibProblem(t *testing.T) {
 	}
 
 	jsonParser := json.NewDecoder(resp.Body)
-	var fib domain.Problem
+	var fib problems.Problem
 
 	if err = jsonParser.Decode(&fib); err != nil {
 		t.Errorf("Could not parse fib problem")
@@ -56,13 +56,13 @@ func TestGetAllProblems(t *testing.T) {
 	}
 
 	jsonParser := json.NewDecoder(resp.Body)
-	var problems []domain.Problem
+	var problemsList []problems.Problem
 
-	if err = jsonParser.Decode(&problems); err != nil {
-		t.Errorf("Could not parse problems")
+	if err = jsonParser.Decode(&problemsList); err != nil {
+		t.Errorf("Could not parse problems list")
 	}
 
-	if len(problems) <= 0 {
+	if len(problemsList) <= 0 {
 		t.Errorf("No problems loaded")
 	}
 }

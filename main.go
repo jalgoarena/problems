@@ -4,18 +4,18 @@ import (
 	"flag"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
-	"github.com/jalgoarena/problems-store/app"
+	"github.com/jalgoarena/problems-store/problems"
 	"log"
 )
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
-	router.GET("/health", app.HealthCheck)
+	router.GET("/health", problems.HealthCheck)
 	v1 := router.Group("api/v1")
 	{
-		v1.GET("/problems", app.GetProblems)
-		v1.GET("/problems/:id", app.GetProblem)
+		v1.GET("/problems", problems.GetProblems)
+		v1.GET("/problems/:id", problems.GetProblem)
 	}
 
 	return router
@@ -40,7 +40,7 @@ func init() {
 		log.Fatalf("opening problems.json file: %v\n", err)
 	}
 
-	if err = app.LoadProblems(problemsJson); err != nil {
+	if err = problems.LoadProblems(problemsJson); err != nil {
 		log.Fatalf("loading problems.json file: %v\n", err)
 	}
 

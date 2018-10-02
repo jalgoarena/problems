@@ -1,14 +1,13 @@
-package app
+package problems
 
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/jalgoarena/problems-store/domain"
 	"io"
 	"net/http"
 )
 
-var problems []domain.Problem
+var problems []Problem
 
 func HealthCheck(c *gin.Context) {
 	if problems == nil || len(problems) == 0 {
@@ -28,7 +27,7 @@ func GetProblems(c *gin.Context) {
 func GetProblem(c *gin.Context) {
 	id := c.Param("id")
 
-	c.JSON(http.StatusOK, First(problems, func(problem domain.Problem) bool {
+	c.JSON(http.StatusOK, First(problems, func(problem Problem) bool {
 		return problem.Id == id
 	}))
 }
@@ -43,12 +42,12 @@ func LoadProblems(problemsJson io.Reader) error {
 	return nil
 }
 
-func First(problems []domain.Problem, f func(problem domain.Problem) bool) domain.Problem {
+func First(problems []Problem, f func(problem Problem) bool) Problem {
 	for _, problem := range problems {
 		if f(problem) {
 			return problem
 		}
 	}
 
-	return domain.Problem{}
+	return Problem{}
 }

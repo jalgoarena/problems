@@ -1,4 +1,4 @@
-package domain
+package problems
 
 type returnStatement struct {
 	Type    string `json:"type"`
