@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/jalgoarena/problems-store/api"
 	"log"
@@ -9,6 +10,7 @@ import (
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	router.GET("/health", api.HealthCheck)
 	v1 := router.Group("api/v1")
