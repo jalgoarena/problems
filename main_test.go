@@ -11,7 +11,7 @@ import (
 
 func TestGetFibProblem(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	testRouter := SetupRouter()
+	testRouter := setupRouter()
 
 	req, err := http.NewRequest("GET", "/api/v1/problems/fib", nil)
 	req.Header.Set("Content-Type", "application/json")
@@ -40,7 +40,7 @@ func TestGetFibProblem(t *testing.T) {
 
 func TestGetAllProblems(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	testRouter := SetupRouter()
+	testRouter := setupRouter()
 
 	req, err := http.NewRequest("GET", "/api/v1/problems", nil)
 	req.Header.Set("Content-Type", "application/json")
