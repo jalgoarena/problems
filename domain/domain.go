@@ -1,4 +1,4 @@
-package main
+package domain
 
 type returnStatement struct {
 	Type    string `json:"type"`
@@ -32,4 +32,16 @@ type Problem struct {
 	Function    function   `json:"func"`
 	TestCases   []testCase `json:"testCases"`
 	Level       int32      `json:"level"`
+}
+
+type Problems []Problem
+
+func (problems *Problems) First(f func(problem Problem) bool) Problem {
+	for _, problem := range *problems {
+		if f(problem) {
+			return problem
+		}
+	}
+
+	return Problem{}
 }
