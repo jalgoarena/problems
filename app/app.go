@@ -28,7 +28,7 @@ func GetProblems(c *gin.Context) {
 func GetProblem(c *gin.Context) {
 	id := c.Param("id")
 
-	c.JSON(http.StatusOK, filter(problems, func(problem domain.Problem) bool {
+	c.JSON(http.StatusOK, First(problems, func(problem domain.Problem) bool {
 		return problem.Id == id
 	}))
 }
@@ -43,7 +43,7 @@ func LoadProblems(problemsJson io.Reader) error {
 	return nil
 }
 
-func filter(problems []domain.Problem, f func(problem domain.Problem) bool) domain.Problem {
+func First(problems []domain.Problem, f func(problem domain.Problem) bool) domain.Problem {
 	for _, problem := range problems {
 		if f(problem) {
 			return problem
