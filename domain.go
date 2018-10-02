@@ -1,4 +1,4 @@
-package problems
+package main
 
 type returnStatement struct {
 	Type    string `json:"type"`
