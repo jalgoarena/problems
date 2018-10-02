@@ -36,12 +36,12 @@ type Problem struct {
 
 type Problems []Problem
 
-func (problems *Problems) First(f func(problem Problem) bool) Problem {
+func (problems *Problems) First(f func(problem Problem) bool) *Problem {
 	for _, problem := range *problems {
 		if f(problem) {
-			return problem
+			return &problem
 		}
 	}
 
-	return Problem{}
+	return &Problem{}
 }

@@ -51,7 +51,7 @@ func HealthCheck(c *gin.Context) {
 
 // curl -i http://localhost:8080/api/v1/problems
 func GetProblems(c *gin.Context) {
-	c.JSON(http.StatusOK, problems)
+	c.JSON(http.StatusOK, &problems)
 }
 
 // curl -i http://localhost:8080/api/v1/problems/fib
