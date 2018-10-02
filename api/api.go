@@ -6,11 +6,13 @@ import (
 	"github.com/gobuffalo/packr"
 	"github.com/jalgoarena/problems-store/domain"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 var problems domain.Problems
+var rawProblems string
 
 func init() {
 	log.SetFlags(log.LstdFlags)
@@ -30,9 +32,14 @@ func init() {
 }
 
 func loadProblems(problemsJSON io.Reader) error {
-	jsonParser := json.NewDecoder(problemsJSON)
+	bytes, err := ioutil.ReadAll(problemsJSON)
+	if err != nil {
+		return err
+	}
 
-	if err := jsonParser.Decode(&problems); err != nil {
+	rawProblems = string(bytes[:])
+
+	if err := json.Unmarshal(bytes, &problems); err != nil {
 		return err
 	}
 
@@ -51,7 +58,7 @@ func HealthCheck(c *gin.Context) {
 
 // curl -i http://localhost:8080/api/v1/problems
 func GetProblems(c *gin.Context) {
-	c.JSON(http.StatusOK, &problems)
+	c.String(http.StatusOK, rawProblems)
 }
 
 // curl -i http://localhost:8080/api/v1/problems/fib
