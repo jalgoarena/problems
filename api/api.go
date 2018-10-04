@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
-	"github.com/jalgoarena/problems-store/domain"
+	"github.com/jalgoarena/problems/pb"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-var problems domain.Problems
-var rawProblems string
+var problems []*pb.Problem
+var rawProblems *string
 
 func init() {
 	log.SetFlags(log.LstdFlags)
@@ -37,7 +37,8 @@ func loadProblems(problemsJSON io.Reader) error {
 		return err
 	}
 
-	rawProblems = string(bytes[:])
+	tmp := string(bytes[:])
+	rawProblems = &tmp
 
 	if err := json.Unmarshal(bytes, &problems); err != nil {
 		return err
@@ -58,14 +59,24 @@ func HealthCheck(c *gin.Context) {
 
 // curl -i http://localhost:8080/api/v1/problems
 func GetProblems(c *gin.Context) {
-	c.String(http.StatusOK, rawProblems)
+	c.String(http.StatusOK, *rawProblems)
 }
 
 // curl -i http://localhost:8080/api/v1/problems/fib
 func GetProblem(c *gin.Context) {
 	id := c.Param("id")
 
-	c.JSON(http.StatusOK, problems.First(func(problem domain.Problem) bool {
+	c.JSON(http.StatusOK, first(problems, func(problem *pb.Problem) bool {
 		return problem.Id == id
 	}))
+}
+
+func first(problems []*pb.Problem, f func(problem *pb.Problem) bool) *pb.Problem {
+	for _, problem := range problems {
+		if f(problem) {
+			return problem
+		}
+	}
+
+	return &pb.Problem{}
 }

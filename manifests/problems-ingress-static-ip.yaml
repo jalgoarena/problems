@@ -1,26 +1,26 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: problems-store-ingress
+  name: problems-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: problems-store-ip
+    kubernetes.io/ingress.global-static-ip-name: problems-ip
   labels:
-    app: problems-store
+    app: problems
 spec:
   backend:
-    serviceName: problems-store-backend
+    serviceName: problems-backend
     servicePort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: problems-store-backend
+  name: problems-backend
   labels:
-    app: problems-store
+    app: problems
 spec:
   type: NodePort
   selector:
-    app: problems-store
+    app: problems
   ports:
     - port: 8080
       targetPort: 8080

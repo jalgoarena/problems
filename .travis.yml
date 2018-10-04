@@ -35,11 +35,11 @@ deploy:
     file:
       - bin/*
     on:
-      repo: jalgoarena/problems-store
+      repo: jalgoarena/problems
       tags: true
       condition: $LATEST = true
   - provider: script
     script: bash docker_push
     on:
-      repo: jalgoarena/problems-store
+      repo: jalgoarena/problems
       tags: true

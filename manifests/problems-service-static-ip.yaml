@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: problems-store-service
+  name: problems-service
   labels:
-    app: problems-store
+    app: problems
 spec:
   selector:
-    app: problems-store
+    app: problems
   ports:
   - port: 80
     targetPort: 8080

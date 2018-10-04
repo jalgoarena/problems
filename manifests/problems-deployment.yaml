@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: problems-store-deployment
+  name: problems-deployment
   labels:
-    app: problems-store
+    app: problems
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: problems-store
+      app: problems
   template:
     metadata:
       labels:
-        app: problems-store
+        app: problems
     spec:
       containers:
-        - name: problems-store-app
-          image: jalgoarena/problems-store:1.0.22
+        - name: problems-app
+          image: jalgoarena/problems:1.0.22
           ports:
             - containerPort: 8080

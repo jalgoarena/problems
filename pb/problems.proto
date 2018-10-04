@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package pb;
+
+service ProblemsStore {
+    rpc FindById (ProblemRequest) returns (ProblemResponse) {}
+    rpc FindAll (ProblemsRequest) returns (ProblemsResponse) {}
+}
+
+message ProblemRequest {
+    string problemId = 1;
+}
+
+message ProblemResponse {
+    Problem problem = 1;
+    string error = 2;
+}
+
+message ProblemsRequest {}
+
+message ProblemsResponse {
+    string problems = 1;
+}
+
+message Problem {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    int64 timeLimit = 4;
+    int32 level = 5;
+}
