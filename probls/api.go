@@ -1,4 +1,4 @@
-package api
+package probls
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ var rawProblems *string
 
 func init() {
 	log.SetFlags(log.LstdFlags)
-	box := packr.NewBox(".")
+	box := packr.NewBox("./data")
 	problemsJSON, err := box.Open("problems.json")
 	defer problemsJSON.Close()
 

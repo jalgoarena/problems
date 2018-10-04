@@ -3,18 +3,18 @@ package main
 import (
 	"flag"
 	"github.com/gin-gonic/gin"
-	"github.com/jalgoarena/problems/api"
+	"github.com/jalgoarena/problems/probls"
 	"log"
 )
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 
-	router.GET("/health", api.HealthCheck)
+	router.GET("/health", probls.HealthCheck)
 	v1 := router.Group("api/v1")
 	{
-		v1.GET("/problems", api.GetProblems)
-		v1.GET("/problems/:id", api.GetProblem)
+		v1.GET("/problems", probls.GetProblems)
+		v1.GET("/problems/:id", probls.GetProblem)
 	}
 
 	return router
