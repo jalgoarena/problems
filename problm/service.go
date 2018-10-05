@@ -1,13 +1,10 @@
-package probls
+package problm
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/gorilla/mux"
 	"github.com/jalgoarena/problems/pb"
-	"net/http"
 )
 
 type Service interface {
@@ -15,11 +12,11 @@ type Service interface {
 	FindAll(ctx context.Context) (*string, error)
 }
 
-type problemsService struct{}
-
 func NewService() Service {
 	return problemsService{}
 }
+
+type problemsService struct{}
 
 func (problemsService) FindById(_ context.Context, problemId string) (*pb.Problem, error) {
 
@@ -39,60 +36,40 @@ type problemRequest struct {
 }
 
 type problemResponse struct {
-	Problem pb.Problem `json:"problem"`
-	Err     string     `json:"err,omitempty"`
+	Problem *pb.Problem `json:"problem"`
+	Err     string      `json:"err,omitempty"`
 }
 
 type problemsRequest struct{}
 
 type problemsResponse struct {
-	Problems string `json:"problems"`
-	Err      string `json:"err,omitempty"`
+	Problems *string `json:"problems"`
+	Err      string  `json:"err,omitempty"`
 }
 
 var (
 	ErrBadRouting = errors.New("inconsistent mapping between route and handler (programmer error)")
 )
 
-func decodeProblemRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	vars := mux.Vars(r)
-	problemId, ok := vars["problemId"]
-	if !ok {
-		return nil, ErrBadRouting
-	}
-
-	return problemRequest{
-		problemId,
-	}, nil
-}
-
-func decodeProblemsRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	return problemsRequest{}, nil
-}
-
-func encodeResponse(_ context.Context, w http.ResponseWriter, resp interface{}) error {
-	return json.NewEncoder(w).Encode(resp)
-}
-
-func makeProblemEndpoint(svc Service) endpoint.Endpoint {
+func MakeProblemEndpoint(svc Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(problemRequest)
 		problem, err := svc.FindById(ctx, req.ProblemId)
 		if err != nil {
 			return problemResponse{nil, err.Error()}, nil
 		}
-		return problemResponse{*problem, nil}, nil
+		return problemResponse{Problem: problem, Err: ""}, nil
 	}
 }
 
-func makeProblemsEndpoint(svc Service) endpoint.Endpoint {
+func MakeProblemsEndpoint(svc Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		_ = request.(problemsRequest)
 		problems, err := svc.FindAll(ctx)
 		if err != nil {
-			return problemsResponse{"", err.Error()}, nil
+			return problemsResponse{nil, err.Error()}, nil
 		}
-		return problemsResponse{*problems, nil}, nil
+		return problemsResponse{Problems: problems, Err: ""}, nil
 	}
 }
 
@@ -112,7 +89,7 @@ func (e Endpoints) FindById(ctx context.Context, problemId string) (*pb.Problem,
 	if problemResp.Err != "" {
 		return nil, errors.New(problemResp.Err)
 	}
-	return &problemResp.Problem, nil
+	return problemResp.Problem, nil
 }
 
 func (e Endpoints) FindAll(ctx context.Context) (*string, error) {
@@ -126,5 +103,5 @@ func (e Endpoints) FindAll(ctx context.Context) (*string, error) {
 	if problemsResp.Err != "" {
 		return nil, errors.New(problemsResp.Err)
 	}
-	return &problemsResp.Problems, nil
+	return problemsResp.Problems, nil
 }

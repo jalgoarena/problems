@@ -1,4 +1,4 @@
-package probls
+package problm
 
 type returnStatement struct {
 	Type    string `json:"type"`
