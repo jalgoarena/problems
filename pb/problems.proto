@@ -13,12 +13,14 @@ message ProblemRequest {
 
 message ProblemResponse {
     Problem problem = 1;
+    string error = 2;
 }
 
 message ProblemsRequest {}
 
 message ProblemsResponse {
     string problems = 1;
+    string error = 2;
 }
 
 message Problem {
