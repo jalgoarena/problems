@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func New(conn *grpc.ClientConn) problm.Service {
+func New(conn *grpc.ClientConn) problm.ProblemsService {
 	problemEndpoint := grpctransport.NewClient(
 		conn, "pb.ProblemsStore", "FindById",
 		problm.EncodeGRPCProblemRequest,

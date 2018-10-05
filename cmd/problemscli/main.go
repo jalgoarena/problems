@@ -38,7 +38,7 @@ func main() {
 	}
 }
 
-func problem(ctx context.Context, service problm.Service, problemId string) {
+func problem(ctx context.Context, service problm.ProblemsService, problemId string) {
 	p, err := service.FindById(ctx, problemId)
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -46,7 +46,7 @@ func problem(ctx context.Context, service problm.Service, problemId string) {
 	fmt.Println(p)
 }
 
-func problems(ctx context.Context, service problm.Service) {
+func problems(ctx context.Context, service problm.ProblemsService) {
 	p, err := service.FindAll(ctx)
 	if err != nil {
 		log.Fatalln(err.Error())

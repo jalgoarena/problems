@@ -7,12 +7,12 @@ import (
 	"github.com/jalgoarena/problems/pb"
 )
 
-type Service interface {
+type ProblemsService interface {
 	FindById(ctx context.Context, problemId string) (*pb.Problem, error)
 	FindAll(ctx context.Context) (*string, error)
 }
 
-func NewService() Service {
+func NewService() ProblemsService {
 	return problemsService{}
 }
 
@@ -51,7 +51,7 @@ var (
 	ErrBadRouting = errors.New("inconsistent mapping between route and handler (programmer error)")
 )
 
-func MakeProblemEndpoint(svc Service) endpoint.Endpoint {
+func MakeProblemEndpoint(svc ProblemsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(problemRequest)
 		problem, err := svc.FindById(ctx, req.ProblemId)
@@ -62,7 +62,7 @@ func MakeProblemEndpoint(svc Service) endpoint.Endpoint {
 	}
 }
 
-func MakeProblemsEndpoint(svc Service) endpoint.Endpoint {
+func MakeProblemsEndpoint(svc ProblemsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		_ = request.(problemsRequest)
 		problems, err := svc.FindAll(ctx)
