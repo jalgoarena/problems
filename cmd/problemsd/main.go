@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/go-kit/kit/log"
 	"github.com/jalgoarena/problems/pb"
 	"github.com/jalgoarena/problems/problm"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -16,6 +16,8 @@ import (
 )
 
 func main() {
+	logger := log.NewLogfmtLogger(os.Stderr)
+
 	var (
 		httpAddr = flag.String("http", ":8080", "http listen address")
 		gRPCAddr = flag.String("grpc", ":8081", "gRPC listen address")
@@ -23,7 +25,9 @@ func main() {
 
 	flag.Parse()
 	ctx := context.Background()
-	srv := problm.NewService()
+	var srv problm.ProblemsService
+	srv = problm.NewService()
+	srv = problm.LoggingMiddleware{Logger: logger, Next: srv}
 	errChan := make(chan error)
 
 	go func() {
@@ -41,7 +45,7 @@ func main() {
 
 	// HTTP Transport
 	go func() {
-		log.Println("http:", *httpAddr)
+		logger.Log("http", *httpAddr)
 		handler := problm.MakeHTTPHandler(ctx, endpoints)
 		errChan <- http.ListenAndServe(*httpAddr, handler)
 	}()
@@ -54,12 +58,12 @@ func main() {
 			return
 		}
 
-		log.Println("grpc:", *gRPCAddr)
+		logger.Log("grpc", *gRPCAddr)
 		handler := problm.NewGRPCServer(ctx, endpoints)
 		gRPCServer := grpc.NewServer()
 		pb.RegisterProblemsStoreServer(gRPCServer, handler)
 		errChan <- gRPCServer.Serve(listener)
 	}()
 
-	log.Fatalln(<-errChan)
+	logger.Log(<-errChan)
 }
