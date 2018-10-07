@@ -8,10 +8,10 @@ import (
 	"github.com/jalgoarena/problems/pb"
 )
 
-func MakeProblemEndpoint(svc ProblemsService) endpoint.Endpoint {
+func MakeProblemEndpoint(svc *ProblemsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(problemRequest)
-		problem, err := svc.FindById(ctx, req.ProblemId)
+		problem, err := (*svc).FindById(ctx, req.ProblemId)
 		if err != nil {
 			return problemResponse{nil, err.Error()}, nil
 		}
@@ -19,10 +19,10 @@ func MakeProblemEndpoint(svc ProblemsService) endpoint.Endpoint {
 	}
 }
 
-func MakeProblemsEndpoint(svc ProblemsService) endpoint.Endpoint {
+func MakeProblemsEndpoint(svc *ProblemsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		_ = request.(problemsRequest)
-		problems, err := svc.FindAll(ctx)
+		problems, err := (*svc).FindAll(ctx)
 		if err != nil {
 			return problemsResponse{nil, err.Error()}, nil
 		}

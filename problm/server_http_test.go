@@ -1,8 +1,8 @@
-package main
+package problm
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"github.com/jalgoarena/problems/pb"
 	"net/http"
 	"net/http/httptest"
@@ -10,14 +10,15 @@ import (
 )
 
 func TestGetFibProblem(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	testRouter := setupRouter()
+	svc := NewService()
+	endpoint := MakeProblemEndpoint(&svc)
+	testHandler := MakeHTTPHandler(context.Background(), Endpoints{ProblemEndpoint: endpoint})
 
 	req, _ := http.NewRequest("GET", "/api/v1/problems/fib", nil)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp := httptest.NewRecorder()
-	testRouter.ServeHTTP(resp, req)
+	testHandler.ServeHTTP(resp, req)
 
 	if resp.Code != 200 {
 		t.Errorf("GET /api/v1/problems/fib failed with response code %d.", resp.Code)
@@ -36,14 +37,15 @@ func TestGetFibProblem(t *testing.T) {
 }
 
 func TestGetAllProblems(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	testRouter := setupRouter()
+	svc := NewService()
+	endpoint := MakeProblemsEndpoint(&svc)
+	testHandler := MakeHTTPHandler(context.Background(), Endpoints{ProblemsEndpoint: endpoint})
 
 	req, _ := http.NewRequest("GET", "/api/v1/problems", nil)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp := httptest.NewRecorder()
-	testRouter.ServeHTTP(resp, req)
+	testHandler.ServeHTTP(resp, req)
 
 	if resp.Code != 200 {
 		t.Errorf("GET /api/v1/problems failed with response code: %d", resp.Code)
@@ -62,15 +64,16 @@ func TestGetAllProblems(t *testing.T) {
 }
 
 func BenchmarkGetFibProblem(b *testing.B) {
-	gin.SetMode(gin.TestMode)
-	testRouter := setupRouter()
+	svc := NewService()
+	endpoint := MakeProblemEndpoint(&svc)
+	testHandler := MakeHTTPHandler(context.Background(), Endpoints{ProblemEndpoint: endpoint})
 
 	for i := 0; i <= b.N; i++ {
 		req, _ := http.NewRequest("GET", "/api/v1/problems/fib", nil)
 		req.Header.Set("Content-Type", "application/json")
 
 		resp := httptest.NewRecorder()
-		testRouter.ServeHTTP(resp, req)
+		testHandler.ServeHTTP(resp, req)
 
 		if resp.Code != 200 {
 			b.Errorf("GET /api/v1/problems/fib failed with response code %d.", resp.Code)
@@ -79,15 +82,16 @@ func BenchmarkGetFibProblem(b *testing.B) {
 }
 
 func BenchmarkGetAllProblems(b *testing.B) {
-	gin.SetMode(gin.TestMode)
-	testRouter := setupRouter()
+	svc := NewService()
+	endpoint := MakeProblemsEndpoint(&svc)
+	testHandler := MakeHTTPHandler(context.Background(), Endpoints{ProblemsEndpoint: endpoint})
 
 	for i := 0; i <= b.N; i++ {
 		req, _ := http.NewRequest("GET", "/api/v1/problems", nil)
 		req.Header.Set("Content-Type", "application/json")
 
 		resp := httptest.NewRecorder()
-		testRouter.ServeHTTP(resp, req)
+		testHandler.ServeHTTP(resp, req)
 
 		if resp.Code != 200 {
 			b.Errorf("GET /api/v1/problems failed with response code: %d", resp.Code)

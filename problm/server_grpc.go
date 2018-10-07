@@ -67,7 +67,7 @@ func DecodeGRPCProblemsResponse(_ context.Context, r interface{}) (interface{}, 
 	return problemsResponse{Problems: &res.Problems, Err: res.Err}, nil
 }
 
-func NewGRPCServer(ctx context.Context, endpoints Endpoints) pb.ProblemsStoreServer {
+func NewGRPCServer(_ context.Context, endpoints Endpoints) pb.ProblemsStoreServer {
 	return &grpcServer{
 		problem: grpctransport.NewServer(
 			endpoints.ProblemEndpoint,

@@ -24,33 +24,16 @@ import (
 func main() {
 	logger := log.NewLogfmtLogger(os.Stderr)
 
-	fieldKeys := []string{"method", "error"}
-	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
-		Namespace: "my_group",
-		Subsystem: "problems_service",
-		Name:      "request_count",
-		Help:      "Number of requests received.",
-	}, fieldKeys)
-	requestLatency := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
-		Namespace: "my_group",
-		Subsystem: "problems_service",
-		Name:      "request_latency_microseconds",
-		Help:      "Total duration of requests in microseconds.",
-	}, fieldKeys)
-
 	var (
 		httpAddr = flag.String("http", ":8080", "http listen address")
 		gRPCAddr = flag.String("grpc", ":8081", "gRPC listen address")
 	)
 
 	flag.Parse()
+
 	ctx := context.Background()
-	var svc problm.ProblemsService
-	svc = problm.NewService()
-	svc = problm.LoggingMiddleware{Logger: logger, Next: svc}
-	svc = problm.InstrumentingMiddleware{
-		RequestCount: requestCount, RequestLatency: requestLatency, Next: svc,
-	}
+	svc := setupService(logger)
+
 	errChan := make(chan error)
 
 	go func() {
@@ -96,5 +79,31 @@ func main() {
 		errChan <- gRPCServer.Serve(listener)
 	}()
 
-	logger.Log(<-errChan)
+	logger.Log("terminated", <-errChan)
+}
+
+func setupService(logger log.Logger) *problm.ProblemsService {
+
+	fieldKeys := []string{"method", "error"}
+	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Namespace: "my_group",
+		Subsystem: "problems_service",
+		Name:      "request_count",
+		Help:      "Number of requests received.",
+	}, fieldKeys)
+	requestLatency := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+		Namespace: "my_group",
+		Subsystem: "problems_service",
+		Name:      "request_latency_microseconds",
+		Help:      "Total duration of requests in microseconds.",
+	}, fieldKeys)
+
+	var svc problm.ProblemsService
+	svc = problm.NewService()
+	svc = problm.LoggingMiddleware{Logger: logger, Next: svc}
+	svc = problm.InstrumentingMiddleware{
+		RequestCount: requestCount, RequestLatency: requestLatency, Next: svc,
+	}
+
+	return &svc
 }

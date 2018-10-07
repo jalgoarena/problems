@@ -12,7 +12,7 @@ type ProblemsService interface {
 }
 
 func NewService() ProblemsService {
-	return problemsService{}
+	return &problemsService{}
 }
 
 type problemsService struct{}

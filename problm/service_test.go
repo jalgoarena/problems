@@ -10,7 +10,10 @@ func TestGetProblem(t *testing.T) {
 	srv := NewService()
 	ctx := context.Background()
 
-	problem := srv.FindById(ctx, "fib")
+	problem, err := srv.FindById(ctx, "fib")
+	if err != nil {
+		t.Error(err)
+	}
 
 	if problem == nil {
 		t.Errorf("FindById(%q) is nil", "fib")
@@ -25,7 +28,10 @@ func TestGetProblems(t *testing.T) {
 	srv := NewService()
 	ctx := context.Background()
 
-	problemsJSON := srv.FindAll(ctx)
+	problemsJSON, err := srv.FindAll(ctx)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if problemsJSON == nil {
 		t.Error("FindAll() is nil")
