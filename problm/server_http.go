@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
@@ -49,5 +50,7 @@ func MakeHTTPHandler(_ context.Context, endpoints Endpoints) http.Handler {
 		decodeProblemRequest,
 		encodeProblemRequest,
 	))
+	r.Methods("GET").Path("/metrics").Handler(promhttp.Handler())
+
 	return r
 }

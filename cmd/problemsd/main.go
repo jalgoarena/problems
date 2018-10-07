@@ -4,19 +4,39 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/go-kit/kit/log"
-	"github.com/jalgoarena/problems/pb"
-	"github.com/jalgoarena/problems/problm"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/jalgoarena/problems/pb"
+	"github.com/jalgoarena/problems/problm"
+
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
+
+	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/log"
+	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 )
 
 func main() {
 	logger := log.NewLogfmtLogger(os.Stderr)
+
+	fieldKeys := []string{"method", "error"}
+	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		Namespace: "my_group",
+		Subsystem: "problems_service",
+		Name:      "request_count",
+		Help:      "Number of requests received.",
+	}, fieldKeys)
+	requestLatency := kitprometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+		Namespace: "my_group",
+		Subsystem: "problems_service",
+		Name:      "request_latency_microseconds",
+		Help:      "Total duration of requests in microseconds.",
+	}, fieldKeys)
 
 	var (
 		httpAddr = flag.String("http", ":8080", "http listen address")
@@ -25,9 +45,12 @@ func main() {
 
 	flag.Parse()
 	ctx := context.Background()
-	var srv problm.ProblemsService
-	srv = problm.NewService()
-	srv = problm.LoggingMiddleware{Logger: logger, Next: srv}
+	var svc problm.ProblemsService
+	svc = problm.NewService()
+	svc = problm.LoggingMiddleware{Logger: logger, Next: svc}
+	svc = problm.InstrumentingMiddleware{
+		RequestCount: requestCount, RequestLatency: requestLatency, Next: svc,
+	}
 	errChan := make(chan error)
 
 	go func() {
@@ -36,8 +59,16 @@ func main() {
 		errChan <- fmt.Errorf("%s", <-c)
 	}()
 
-	problemEndpoint := problm.MakeProblemEndpoint(srv)
-	problemsEndpoint := problm.MakeProblemsEndpoint(srv)
+	var problemEndpoint endpoint.Endpoint
+	problemEndpoint = problm.MakeProblemEndpoint(svc)
+	problemEndpoint = problm.TransportLoggingMiddleware(
+		log.With(logger, "method", "FindById"))(problemEndpoint)
+
+	var problemsEndpoint endpoint.Endpoint
+	problemsEndpoint = problm.MakeProblemsEndpoint(svc)
+	problemsEndpoint = problm.TransportLoggingMiddleware(
+		log.With(logger, "method", "FindAll"))(problemsEndpoint)
+
 	endpoints := problm.Endpoints{
 		ProblemEndpoint:  problemEndpoint,
 		ProblemsEndpoint: problemsEndpoint,
