@@ -5,6 +5,7 @@ package pb;
 service ProblemsStore {
     rpc FindById (ProblemRequest) returns (ProblemResponse) {}
     rpc FindAll (ProblemsRequest) returns (ProblemsResponse) {}
+    rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message ProblemRequest {
@@ -29,4 +30,11 @@ message Problem {
     string description = 3;
     int64 timeLimit = 4;
     int32 level = 5;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+    bool up = 1;
+    int32 problemCount = 2;
 }

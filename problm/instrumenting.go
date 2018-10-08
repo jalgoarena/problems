@@ -35,3 +35,14 @@ func (mw InstrumentingMiddleware) FindAll(ctx context.Context) (output *string, 
 	output, err = mw.Next.FindAll(ctx)
 	return
 }
+
+func (mw InstrumentingMiddleware) HealthCheck(ctx context.Context) (output *pb.HealthCheckResponse, err error) {
+	defer func(begin time.Time) {
+		lvs := []string{"method", "healthcheck", "error", fmt.Sprint(err != nil)}
+		mw.RequestCount.With(lvs...).Add(1)
+		mw.RequestLatency.With(lvs...).Observe(time.Since(begin).Seconds())
+	}(time.Now())
+
+	output, err = mw.Next.HealthCheck(ctx)
+	return
+}

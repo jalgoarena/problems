@@ -52,9 +52,15 @@ func main() {
 	problemsEndpoint = problm.TransportLoggingMiddleware(
 		log.With(logger, "method", "FindAll"))(problemsEndpoint)
 
+	var healthCheckEndpoint endpoint.Endpoint
+	healthCheckEndpoint = problm.MakeHealthCheckEndpoint(svc)
+	healthCheckEndpoint = problm.TransportLoggingMiddleware(
+		log.With(logger, "method", "HealthCheck"))(healthCheckEndpoint)
+
 	endpoints := problm.Endpoints{
-		ProblemEndpoint:  problemEndpoint,
-		ProblemsEndpoint: problemsEndpoint,
+		ProblemEndpoint:     problemEndpoint,
+		ProblemsEndpoint:    problemsEndpoint,
+		HealthCheckEndpoint: healthCheckEndpoint,
 	}
 
 	// HTTP Transport

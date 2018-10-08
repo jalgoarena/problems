@@ -7,8 +7,9 @@ import (
 )
 
 type grpcServer struct {
-	problem  grpctransport.Handler
-	problems grpctransport.Handler
+	problem     grpctransport.Handler
+	problems    grpctransport.Handler
+	healthCheck grpctransport.Handler
 }
 
 func (s *grpcServer) FindById(ctx context.Context, r *pb.ProblemRequest) (*pb.ProblemResponse, error) {
@@ -25,6 +26,14 @@ func (s *grpcServer) FindAll(ctx context.Context, r *pb.ProblemsRequest) (*pb.Pr
 		return nil, err
 	}
 	return resp.(*pb.ProblemsResponse), nil
+}
+
+func (s *grpcServer) HealthCheck(ctx context.Context, r *pb.HealthCheckRequest) (*pb.HealthCheckResponse, error) {
+	_, resp, err := s.healthCheck.ServeGRPC(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.HealthCheckResponse), nil
 }
 
 func EncodeGRPCProblemRequest(_ context.Context, r interface{}) (interface{}, error) {
@@ -67,6 +76,16 @@ func DecodeGRPCProblemsResponse(_ context.Context, r interface{}) (interface{}, 
 	return problemsResponse{Problems: &res.Problems, Err: res.Err}, nil
 }
 
+func DecodeGRPCHealthCheckRequest(_ context.Context, r interface{}) (interface{}, error) {
+	_ = r.(*pb.HealthCheckRequest)
+	return healthCheckRequest{}, nil
+}
+
+func EncodeGRPCHealthCheckResponse(_ context.Context, r interface{}) (interface{}, error) {
+	res := r.(healthCheckResponse)
+	return &pb.HealthCheckResponse{Up: res.HealthCheckResult.Up, ProblemCount: res.HealthCheckResult.ProblemCount}, nil
+}
+
 func NewGRPCServer(_ context.Context, endpoints Endpoints) pb.ProblemsStoreServer {
 	return &grpcServer{
 		problem: grpctransport.NewServer(
@@ -78,6 +97,11 @@ func NewGRPCServer(_ context.Context, endpoints Endpoints) pb.ProblemsStoreServe
 			endpoints.ProblemsEndpoint,
 			DecodeGRPCProblemsRequest,
 			EncodeGRPCProblemsResponse,
+		),
+		healthCheck: grpctransport.NewServer(
+			endpoints.HealthCheckEndpoint,
+			DecodeGRPCHealthCheckRequest,
+			EncodeGRPCHealthCheckResponse,
 		),
 	}
 }

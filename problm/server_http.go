@@ -21,7 +21,7 @@ func decodeProblemRequest(_ context.Context, r *http.Request) (interface{}, erro
 	}, nil
 }
 
-func encodeProblemRequest(_ context.Context, w http.ResponseWriter, resp interface{}) error {
+func encodeProblemResponse(_ context.Context, w http.ResponseWriter, resp interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	return json.NewEncoder(w).Encode(resp.(problemResponse).Problem)
 }
@@ -38,6 +38,15 @@ func encodeProblemsResponse(_ context.Context, w http.ResponseWriter, resp inter
 	return err
 }
 
+func decodeHealthCheckRequest(_ context.Context, _ *http.Request) (interface{}, error) {
+	return healthCheckRequest{}, nil
+}
+
+func encodeHealthCheckResponse(_ context.Context, w http.ResponseWriter, resp interface{}) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	return json.NewEncoder(w).Encode(resp.(healthCheckResponse).HealthCheckResult)
+}
+
 func MakeHTTPHandler(_ context.Context, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Methods("GET").Path("/api/v1/problems").Handler(httptransport.NewServer(
@@ -48,9 +57,14 @@ func MakeHTTPHandler(_ context.Context, endpoints Endpoints) http.Handler {
 	r.Methods("GET").Path("/api/v1/problems/{problemId}").Handler(httptransport.NewServer(
 		endpoints.ProblemEndpoint,
 		decodeProblemRequest,
-		encodeProblemRequest,
+		encodeProblemResponse,
 	))
 	r.Methods("GET").Path("/metrics").Handler(promhttp.Handler())
+	r.Methods("GET").Path("/health").Handler(httptransport.NewServer(
+		endpoints.HealthCheckEndpoint,
+		decodeHealthCheckRequest,
+		encodeHealthCheckResponse,
+	))
 
 	return r
 }

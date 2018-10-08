@@ -30,9 +30,21 @@ func MakeProblemsEndpoint(svc *ProblemsService) endpoint.Endpoint {
 	}
 }
 
+func MakeHealthCheckEndpoint(svc *ProblemsService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		_ = request.(healthCheckRequest)
+		response, err := (*svc).HealthCheck(ctx)
+		if err != nil {
+			return healthCheckResponse{HealthCheckResult: response}, err
+		}
+		return healthCheckResponse{HealthCheckResult: response}, nil
+	}
+}
+
 type Endpoints struct {
-	ProblemEndpoint  endpoint.Endpoint
-	ProblemsEndpoint endpoint.Endpoint
+	ProblemEndpoint     endpoint.Endpoint
+	ProblemsEndpoint    endpoint.Endpoint
+	HealthCheckEndpoint endpoint.Endpoint
 }
 
 func (e Endpoints) FindById(ctx context.Context, problemId string) (*pb.Problem, error) {
@@ -61,6 +73,17 @@ func (e Endpoints) FindAll(ctx context.Context) (*string, error) {
 		return nil, errors.New(problemsResp.Err)
 	}
 	return problemsResp.Problems, nil
+}
+
+func (e Endpoints) HealthCheck(ctx context.Context) (*pb.HealthCheckResponse, error) {
+	req := healthCheckRequest{}
+	resp, err := e.HealthCheckEndpoint(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	healthCheckResp := resp.(healthCheckResponse)
+	return healthCheckResp.HealthCheckResult, nil
 }
 
 func TransportLoggingMiddleware(logger log.Logger) endpoint.Middleware {

@@ -40,3 +40,17 @@ func (mw LoggingMiddleware) FindAll(ctx context.Context) (p *string, err error) 
 	p, err = mw.Next.FindAll(ctx)
 	return
 }
+
+func (mw LoggingMiddleware) HealthCheck(ctx context.Context) (output *pb.HealthCheckResponse, err error) {
+	defer func(begin time.Time) {
+		_ = mw.Logger.Log(
+			"method", "HealthCheck",
+			"up", output.Up,
+			"err", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	output, err = mw.Next.HealthCheck(ctx)
+	return
+}

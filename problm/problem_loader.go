@@ -2,13 +2,11 @@ package problm
 
 import (
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"github.com/gobuffalo/packr"
 	"github.com/jalgoarena/problems/pb"
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 )
 
 var problems []*pb.Problem
@@ -44,14 +42,4 @@ func loadProblems(problemsJSON io.Reader) error {
 	}
 
 	return nil
-}
-
-// curl -i http://localhost:8080/health
-func HealthCheck(c *gin.Context) {
-	if problems == nil || len(problems) == 0 {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"status": "fail", "reason": "problems setup failed"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"status": "ok", "problemsCount": len(problems)})
 }
