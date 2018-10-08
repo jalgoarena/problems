@@ -18,17 +18,17 @@
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
 
 [[projects]]
-  branch = "master"
-  digest = "1:e7315bfadb511de94856ec1066d8252134222b7d51044effc8cea1c2426adfb0"
+  digest = "1:7f029513a3c64c1fc923af79bf27d4fd0ce4fafdd13b421c1884d52c84e9c600"
   name = "github.com/gin-gonic/gin"
   packages = [
     ".",
     "binding",
-    "internal/json",
+    "json",
     "render",
   ]
   pruneopts = "NUT"
-  revision = "e9f187f60a27477e54c177f314db00d6a1abf062"
+  revision = "b869fe1415e4b9eb52f247441830d502aece2d4d"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:c305b2121df315d7d4ce34a83b01983642359296747b8ca6c2df80222f5f46d3"
@@ -222,15 +222,15 @@
     "trace",
   ]
   pruneopts = "NUT"
-  revision = "f5e5bdd778241bfefa8627f7124c39cd6ad8d74f"
+  revision = "146acd28ed5894421fb5aac80ca93bc1b1f46f87"
 
 [[projects]]
   branch = "master"
-  digest = "1:79325523c76a32a00daae41a018570653948212a2b93838c83c571f6a68e48ef"
+  digest = "1:a9bc64e1206f3d5ce2ac71e397ddfe81065ac706929d34fcb3f0a48e74cd6e3b"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "NUT"
-  revision = "e4b3c5e9061176387e7cea65e4dc5853801f3fb7"
+  revision = "4497e2df6f9e69048a54498c7affbbec3294ad47"
 
 [[projects]]
   digest = "1:e7071ed636b5422cc51c0e3a6cebc229d6c9fffc528814b519a980641422d619"
@@ -321,6 +321,7 @@
     "github.com/gin-gonic/gin",
     "github.com/go-kit/kit/endpoint",
     "github.com/go-kit/kit/log",
+    "github.com/go-kit/kit/metrics",
     "github.com/go-kit/kit/metrics/prometheus",
     "github.com/go-kit/kit/transport/grpc",
     "github.com/go-kit/kit/transport/http",

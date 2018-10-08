@@ -4,10 +4,6 @@
   non-go = true
 
 [[constraint]]
-  name = "github.com/gin-gonic/gin"
-  branch = "master"
-
-[[constraint]]
   name = "github.com/gobuffalo/packr"
   version = "1.13.5"
 
