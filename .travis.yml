@@ -21,7 +21,7 @@ script:
   - dep ensure
   - go vet $(go list ./... | grep -v /vendor/)
   - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-  - if [ "${LATEST}" = "true" ]; then packr && gox -os="linux darwin windows" -arch="amd64" -output="bin/{{.Dir}}_1.0.3_{{.OS}}_{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
+  - if [ "${LATEST}" = "true" ]; then packr && gox -os="linux darwin windows" -arch="amd64" -output="bin/{{.Dir}}_{{.OS}}_{{.Arch}}" -ldflags "-X main.Rev=`git rev-parse --short HEAD`" -verbose ./...; fi
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
@@ -33,7 +33,7 @@ deploy:
     skip_cleanup: true
     file_glob: true
     file:
-      - bin/*
+      - bin/problemsd*
     on:
       repo: jalgoarena/problems
       tags: true
