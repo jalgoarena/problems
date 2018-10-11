@@ -16,7 +16,6 @@ import (
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 
-	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 )
@@ -42,26 +41,7 @@ func main() {
 		errChan <- fmt.Errorf("%s", <-c)
 	}()
 
-	var problemEndpoint endpoint.Endpoint
-	problemEndpoint = problm.MakeProblemEndpoint(svc)
-	problemEndpoint = problm.TransportLoggingMiddleware(
-		log.With(logger, "method", "FindById"))(problemEndpoint)
-
-	var problemsEndpoint endpoint.Endpoint
-	problemsEndpoint = problm.MakeProblemsEndpoint(svc)
-	problemsEndpoint = problm.TransportLoggingMiddleware(
-		log.With(logger, "method", "FindAll"))(problemsEndpoint)
-
-	var healthCheckEndpoint endpoint.Endpoint
-	healthCheckEndpoint = problm.MakeHealthCheckEndpoint(svc)
-	healthCheckEndpoint = problm.TransportLoggingMiddleware(
-		log.With(logger, "method", "HealthCheck"))(healthCheckEndpoint)
-
-	endpoints := problm.Endpoints{
-		ProblemEndpoint:     problemEndpoint,
-		ProblemsEndpoint:    problemsEndpoint,
-		HealthCheckEndpoint: healthCheckEndpoint,
-	}
+	endpoints := problm.MakeServerEndpoints(svc, logger)
 
 	// HTTP Transport
 	go func() {

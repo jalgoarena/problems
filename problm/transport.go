@@ -41,6 +41,29 @@ func MakeHealthCheckEndpoint(svc *ProblemsService) endpoint.Endpoint {
 	}
 }
 
+func MakeServerEndpoints(svc *ProblemsService, logger log.Logger) Endpoints {
+	var problemEndpoint endpoint.Endpoint
+	problemEndpoint = MakeProblemEndpoint(svc)
+	problemEndpoint = TransportLoggingMiddleware(
+		log.With(logger, "method", "FindById"))(problemEndpoint)
+
+	var problemsEndpoint endpoint.Endpoint
+	problemsEndpoint = MakeProblemsEndpoint(svc)
+	problemsEndpoint = TransportLoggingMiddleware(
+		log.With(logger, "method", "FindAll"))(problemsEndpoint)
+
+	var healthCheckEndpoint endpoint.Endpoint
+	healthCheckEndpoint = MakeHealthCheckEndpoint(svc)
+	healthCheckEndpoint = TransportLoggingMiddleware(
+		log.With(logger, "method", "HealthCheck"))(healthCheckEndpoint)
+
+	return Endpoints{
+		ProblemEndpoint:     problemEndpoint,
+		ProblemsEndpoint:    problemsEndpoint,
+		HealthCheckEndpoint: healthCheckEndpoint,
+	}
+}
+
 type Endpoints struct {
 	ProblemEndpoint     endpoint.Endpoint
 	ProblemsEndpoint    endpoint.Endpoint
