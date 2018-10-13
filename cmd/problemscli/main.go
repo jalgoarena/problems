@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	grpcclient "github.com/jalgoarena/problems/client/grpc"
-	"github.com/jalgoarena/problems/problm"
+	"github.com/jalgoarena/problems/pkg/problm"
 	"google.golang.org/grpc"
 	"log"
 	"time"

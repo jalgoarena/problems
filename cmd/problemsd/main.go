@@ -11,7 +11,7 @@ import (
 	"syscall"
 
 	"github.com/jalgoarena/problems/pb"
-	"github.com/jalgoarena/problems/problm"
+	"github.com/jalgoarena/problems/pkg/problm"
 
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"

@@ -3,7 +3,7 @@ package grpc
 import (
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	"github.com/jalgoarena/problems/pb"
-	"github.com/jalgoarena/problems/problm"
+	"github.com/jalgoarena/problems/pkg/problm"
 	"google.golang.org/grpc"
 )
 
