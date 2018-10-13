@@ -3,6 +3,7 @@ package problm
 import (
 	"context"
 	"encoding/json"
+	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -47,7 +48,7 @@ func encodeHealthCheckResponse(_ context.Context, w http.ResponseWriter, resp in
 	return json.NewEncoder(w).Encode(resp.(healthCheckResponse).HealthCheckResult)
 }
 
-func MakeHTTPHandler(_ context.Context, endpoints Endpoints) http.Handler {
+func MakeHTTPHandler(endpoints Endpoints, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 	r.Methods("GET").Path("/api/v1/problems").Handler(httptransport.NewServer(
 		endpoints.ProblemsEndpoint,
@@ -66,5 +67,17 @@ func MakeHTTPHandler(_ context.Context, endpoints Endpoints) http.Handler {
 		encodeHealthCheckResponse,
 	))
 
-	return r
+	return httpLoggingMiddleware(logger)(r)
+}
+
+type httpMiddleware func(http.Handler) http.Handler
+
+func httpLoggingMiddleware(logger log.Logger) httpMiddleware {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger.Log("transport", "http", "before", r.RequestURI)
+			defer logger.Log("transport", "http", "after", r.RequestURI)
+			h.ServeHTTP(w, r)
+		})
+	}
 }

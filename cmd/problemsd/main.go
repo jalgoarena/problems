@@ -21,7 +21,12 @@ import (
 )
 
 func main() {
-	logger := log.NewLogfmtLogger(os.Stderr)
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+		logger = log.With(logger, "caller", log.DefaultCaller)
+	}
 
 	var (
 		httpAddr = flag.String("http", ":8080", "http listen address")
@@ -46,7 +51,7 @@ func main() {
 	// HTTP Transport
 	go func() {
 		logger.Log("http", *httpAddr)
-		handler := problm.MakeHTTPHandler(ctx, endpoints)
+		handler := problm.MakeHTTPHandler(endpoints, logger)
 		errChan <- http.ListenAndServe(*httpAddr, handler)
 	}()
 
@@ -71,6 +76,7 @@ func main() {
 func setupService(logger log.Logger) *problm.ProblemsService {
 
 	fieldKeys := []string{"method", "error"}
+
 	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 		Namespace: "my_group",
 		Subsystem: "problems_service",
@@ -84,12 +90,9 @@ func setupService(logger log.Logger) *problm.ProblemsService {
 		Help:      "Total duration of requests in microseconds.",
 	}, fieldKeys)
 
-	var svc problm.ProblemsService
-	svc = problm.NewService()
-	svc = problm.LoggingMiddleware{Logger: logger, Next: svc}
-	svc = problm.InstrumentingMiddleware{
-		RequestCount: requestCount, RequestLatency: requestLatency, Next: svc,
-	}
+	svc := problm.NewService()
+	svc = problm.LoggingMiddleware(logger)(svc)
+	svc = problm.InstrumentingMiddleware(requestCount, requestLatency)(svc)
 
 	return &svc
 }

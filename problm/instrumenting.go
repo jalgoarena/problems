@@ -8,13 +8,19 @@ import (
 	"time"
 )
 
-type InstrumentingMiddleware struct {
+type instrumentingMiddleware struct {
 	RequestCount   metrics.Counter
 	RequestLatency metrics.Histogram
 	Next           ProblemsService
 }
 
-func (mw InstrumentingMiddleware) FindById(ctx context.Context, problemId string) (output *pb.Problem, err error) {
+func InstrumentingMiddleware(requestCount metrics.Counter, requestLatency metrics.Histogram) ServiceMiddleware {
+	return func(next ProblemsService) ProblemsService {
+		return instrumentingMiddleware{requestCount, requestLatency, next}
+	}
+}
+
+func (mw instrumentingMiddleware) FindById(ctx context.Context, problemId string) (output *pb.Problem, err error) {
 	defer func(begin time.Time) {
 		lvs := []string{"method", "findbyid", "error", fmt.Sprint(err != nil)}
 		mw.RequestCount.With(lvs...).Add(1)
@@ -25,7 +31,7 @@ func (mw InstrumentingMiddleware) FindById(ctx context.Context, problemId string
 	return
 }
 
-func (mw InstrumentingMiddleware) FindAll(ctx context.Context) (output *string, err error) {
+func (mw instrumentingMiddleware) FindAll(ctx context.Context) (output *string, err error) {
 	defer func(begin time.Time) {
 		lvs := []string{"method", "findall", "error", fmt.Sprint(err != nil)}
 		mw.RequestCount.With(lvs...).Add(1)
@@ -36,7 +42,7 @@ func (mw InstrumentingMiddleware) FindAll(ctx context.Context) (output *string, 
 	return
 }
 
-func (mw InstrumentingMiddleware) HealthCheck(ctx context.Context) (output *pb.HealthCheckResponse, err error) {
+func (mw instrumentingMiddleware) HealthCheck(ctx context.Context) (output *pb.HealthCheckResponse, err error) {
 	defer func(begin time.Time) {
 		lvs := []string{"method", "healthcheck", "error", fmt.Sprint(err != nil)}
 		mw.RequestCount.With(lvs...).Add(1)

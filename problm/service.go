@@ -6,6 +6,8 @@ import (
 	"github.com/jalgoarena/problems/pb"
 )
 
+type ServiceMiddleware func(service ProblemsService) ProblemsService
+
 type ProblemsService interface {
 	FindById(ctx context.Context, problemId string) (*pb.Problem, error)
 	FindAll(ctx context.Context) (*string, error)

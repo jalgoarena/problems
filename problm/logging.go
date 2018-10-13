@@ -8,12 +8,18 @@ import (
 	"time"
 )
 
-type LoggingMiddleware struct {
-	Logger log.Logger
+type loggingMiddleware struct {
 	Next   ProblemsService
+	Logger log.Logger
 }
 
-func (mw LoggingMiddleware) FindById(ctx context.Context, problemId string) (p *pb.Problem, err error) {
+func LoggingMiddleware(logger log.Logger) ServiceMiddleware {
+	return func(next ProblemsService) ProblemsService {
+		return loggingMiddleware{next, logger}
+	}
+}
+
+func (mw loggingMiddleware) FindById(ctx context.Context, problemId string) (p *pb.Problem, err error) {
 	defer func(begin time.Time) {
 		_ = mw.Logger.Log(
 			"method", fmt.Sprintf("FindById('%s')", problemId),
@@ -27,7 +33,7 @@ func (mw LoggingMiddleware) FindById(ctx context.Context, problemId string) (p *
 	return
 }
 
-func (mw LoggingMiddleware) FindAll(ctx context.Context) (p *string, err error) {
+func (mw loggingMiddleware) FindAll(ctx context.Context) (p *string, err error) {
 	defer func(begin time.Time) {
 		_ = mw.Logger.Log(
 			"method", "FindAll",
@@ -41,7 +47,7 @@ func (mw LoggingMiddleware) FindAll(ctx context.Context) (p *string, err error) 
 	return
 }
 
-func (mw LoggingMiddleware) HealthCheck(ctx context.Context) (output *pb.HealthCheckResponse, err error) {
+func (mw loggingMiddleware) HealthCheck(ctx context.Context) (output *pb.HealthCheckResponse, err error) {
 	defer func(begin time.Time) {
 		_ = mw.Logger.Log(
 			"method", "HealthCheck",
